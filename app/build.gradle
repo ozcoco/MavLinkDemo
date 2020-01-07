@@ -37,7 +37,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs "opencv/staticlibs", "opencv/3rdparty"
+            jniLibs.srcDirs "opencv/libs", "opencv/3rdparty", "opencv/staticlibs"
         }
     }
 

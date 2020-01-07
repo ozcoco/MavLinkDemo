@@ -12,8 +12,10 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} CV-SRC)
 set(opencv-dir ../../../../opencv)
 
 link_directories(
+        ${opencv-dir}/libs/${ANDROID_ABI}
         ${opencv-dir}/3rdparty/${ANDROID_ABI}
-        ${opencv-dir}/staticlibs/${ANDROID_ABI})
+        ${opencv-dir}/staticlibs/${ANDROID_ABI}
+)
 
 set(opencv-lib
         #opencv
@@ -48,7 +50,9 @@ set(opencv-lib
 
 add_library(cv-lib SHARED ${CV-SRC})
 
-target_link_libraries(cv-lib log ${opencv-lib})
+target_link_libraries(cv-lib c++_shared log opencv_java4)
+
+#${opencv-lib}
 
 
 
