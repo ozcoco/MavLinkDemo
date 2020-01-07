@@ -1,0 +1,2 @@
+include ':app', ':viewpager2', ':SwipeRefreshMultipleViews', ':SimpleTransition', ':RecyclerViewAnimations', ':DataBindingDataBoundRecyclerView'
+rootProject.name='MavLink'
