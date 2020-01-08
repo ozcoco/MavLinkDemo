@@ -189,11 +189,17 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("^_^ ---->", "image format: " + image.getImage().getFormat());
 
-//            byte[] pxs = ImageUtils.imageToByteArray(image.getImage());
+            CvUtils.nativeYUV420888Gray(image.getPlanes()[0].getBuffer(),
+                    image.getPlanes()[1].getBuffer(),
+                    image.getPlanes()[2].getBuffer(),
+                    image.getWidth(),
+                    image.getHeight());
 
-            byte[] pxs = CvUtils.native_NV21_gray(ImageUtils.YUV_420_888toNV21(image.getImage()), image.getWidth(), image.getHeight());
+            byte[] pxs = ImageUtils.imageToByteArray(image.getImage());
 
             Bitmap bmp = BitmapFactory.decodeByteArray(pxs, 0, pxs.length);
+
+//            CvUtils.nativeBitmapGray(bmp);
 
             mBinding.imgShow.post(() -> {
 

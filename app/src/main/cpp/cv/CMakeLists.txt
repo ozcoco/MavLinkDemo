@@ -50,7 +50,7 @@ set(opencv-lib
 
 add_library(cv-lib SHARED ${CV-SRC})
 
-target_link_libraries(cv-lib c++_shared log opencv_java4)
+target_link_libraries(cv-lib c++_shared android jnigraphics m log opencv_java4)
 
 #${opencv-lib}
 

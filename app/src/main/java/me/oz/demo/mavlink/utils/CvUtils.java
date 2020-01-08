@@ -1,5 +1,9 @@
 package me.oz.demo.mavlink.utils;
 
+import android.graphics.Bitmap;
+
+import java.nio.ByteBuffer;
+
 /**
  * @ProjectName: MavLink
  * @Package: me.oz.demo.mavlink.utils
@@ -15,12 +19,13 @@ package me.oz.demo.mavlink.utils;
 public class CvUtils {
 
     static {
-
         System.loadLibrary("cv-lib");
-
     }
 
+    public native static byte[] nativeNV21Gray(byte[] yuv, int width, int height);
 
-    public native static byte[] native_NV21_gray(byte[] yuv, int width, int height);
+    public native static void nativeBitmapGray(Bitmap bmp);
+
+    public native static void nativeYUV420888Gray(ByteBuffer y, ByteBuffer u, ByteBuffer v, int width, int height);
 
 }
