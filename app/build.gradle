@@ -17,7 +17,7 @@ android {
         }
 
         ndk {
-            abiFilters 'arm64-v8a', 'x86_64'
+            abiFilters 'arm64-v8a'/*, 'x86_64', 'armeabi-v7a', 'x86'*/
         }
 
     }
@@ -37,7 +37,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs "opencv/libs", "opencv/3rdparty", "opencv/staticlibs", "libs"
+            jniLibs.srcDirs "opencv/libs", "opencv/3rdparty", "opencv/staticlibs", "libs", "ffmpeg"
         }
     }
 

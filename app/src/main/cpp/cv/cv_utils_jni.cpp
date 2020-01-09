@@ -15,6 +15,51 @@
 using namespace mcv;
 using namespace cv;
 
+#define YUV_COLOR_GRAY 128
+
+
+extern "C"
+JNIEXPORT void
+JNICALL
+Java_me_oz_demo_mavlink_utils_CvUtils_nativeYUV420888Bitmap565(JNIEnv *env, jclass type,
+                                                               jobject yBuff,
+                                                               jobject uBuff,
+                                                               jobject vBuff,
+                                                               jobject bmp,
+                                                               jint width,
+                                                               jint height) {
+
+    const jlong &ySize = env->GetDirectBufferCapacity(yBuff);
+
+    const jlong &uSize = env->GetDirectBufferCapacity(uBuff);
+
+    const jlong &vSize = env->GetDirectBufferCapacity(vBuff);
+
+    void *y = env->GetDirectBufferAddress(yBuff);
+
+    void *u = env->GetDirectBufferAddress(uBuff);
+
+    void *v = env->GetDirectBufferAddress(vBuff);
+
+    std::unique_ptr<uint8_t> nv21{new uint8_t[ySize + vSize + uSize]};
+
+    memcpy(nv21.get(), y, (size_t) ySize);
+
+    memcpy(nv21.get() + ySize, v, (size_t) vSize);
+
+    memcpy(nv21.get() + ySize + vSize, u, (size_t) uSize);
+
+    Mat src;
+
+    nv21_2_mat_RGB(src, nv21.get(), width, height);
+
+    Mat grayMat;
+
+    cvtColor(src, grayMat, COLOR_RGB2GRAY);
+
+    mat_2_bitmap(env, grayMat, bmp);
+}
+
 
 extern "C"
 JNIEXPORT void
@@ -29,33 +74,39 @@ Java_me_oz_demo_mavlink_utils_CvUtils_nativeYUV420888Gray(JNIEnv *env, jclass ty
 
     const jlong &vSize = env->GetDirectBufferCapacity(vBuff);
 
-    char *y = static_cast<char *>(env->GetDirectBufferAddress(yBuff));
+    auto *y = static_cast<uint8_t *>(env->GetDirectBufferAddress(yBuff));
 
-    char *u = static_cast<char *>(env->GetDirectBufferAddress(uBuff));
+    auto *u = static_cast<uint8_t *>(env->GetDirectBufferAddress(uBuff));
 
-    char *v = static_cast<char *>(env->GetDirectBufferAddress(vBuff));
+    auto *v = static_cast<uint8_t *>(env->GetDirectBufferAddress(vBuff));
 
-    const auto yuvSize = static_cast<const size_t>(height + height / 2, width);
+    std::for_each(u, u + uSize, [](uint8_t &e) -> void {
+        e = saturate_cast<uint8_t>(YUV_COLOR_GRAY);
+    });
 
-    std::unique_ptr<char> yuv{new char[yuvSize]};
+    std::for_each(v, v + vSize, [](uint8_t &e) -> void {
+        e = saturate_cast<uint8_t>(YUV_COLOR_GRAY);
+    });
 
-    std::copy(y, y + ySize, yuv.get());
+    std::unique_ptr<uint8_t> nv21{new uint8_t[ySize + vSize + uSize]};
 
-    std::copy(u, u + uSize, yuv.get() + ySize);
+    memcpy(nv21.get(), y, (size_t) ySize);
 
-    std::copy(v, v + vSize, yuv.get() + ySize + uSize);
+    memcpy(nv21.get() + ySize, v, (size_t) vSize);
 
-    Mat src{height + height / 2, width, CV_8UC3, yuv.get()};
+    memcpy(nv21.get() + ySize + vSize, u, (size_t) uSize);
+
+    Mat nv21Mat{height + height / 2, width, CV_8UC1, nv21.get()};
 
     Mat dst;
 
-    cvtColor(src, dst, COLOR_YUV2GRAY_420, 1);
+    cvtColor(nv21Mat, dst, COLOR_YUV2GRAY_NV21);
 
-    memcpy(y, dst.data, (size_t) height * width);
+    memcpy(y, dst.data, (size_t) ySize);
 
-    memcpy(u, dst.data + height * width, (size_t) height * width / 4);
+    memcpy(v, dst.data + ySize, (size_t) vSize);
 
-    memcpy(v, dst.data + height * width + height * width / 4, (size_t) height * width / 4);
+    memcpy(u, dst.data + ySize + vSize, (size_t) uSize);
 
 }
 
@@ -70,9 +121,15 @@ Java_me_oz_demo_mavlink_utils_CvUtils_nativeBitmapGray(JNIEnv *env, jclass type,
 
     Mat dst;
 
-    gray(dst, src);
+//    gray(dst, src);
 
-    blur(src, dst, Size(20, 20));
+//    blur(src, dst, Size(20, 20));
+
+    Mat_<char> kernel(3, 3);
+
+    kernel << 0, -1, 0, -1, 5, -1, 0, -1, 0;
+
+    filter2D(src, dst, dst.depth(), kernel);
 
     mat_2_bitmap(env, dst, bmp);
 }

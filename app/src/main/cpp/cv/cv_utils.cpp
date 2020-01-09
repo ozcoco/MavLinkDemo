@@ -6,6 +6,31 @@
 #include <android/bitmap.h>
 #include <utils/log.h>
 
+void mcv::cvt::nv21_2_mat_RGBA(Mat &dst, uint8_t *nv21, int width, int height) noexcept {
+
+    Mat nv21Mat{height + height / 2, width, CV_8UC1, nv21};
+
+    cvtColor(nv21Mat, dst, COLOR_YUV2RGBA_NV21, 4);
+}
+
+void mcv::cvt::nv21_2_mat_RGB(Mat &dst, uint8_t *nv21, int width, int height) noexcept {
+
+    Mat nv21Mat{height + height / 2, width, CV_8UC1, nv21};
+
+    cvtColor(nv21Mat, dst, COLOR_YUV2RGB_NV21, 3);
+}
+
+Mat mcv::cvt::nv21_2_mat_RGB(uint8_t *nv21, int width, int height) noexcept {
+
+    Mat nv21Mat{height + height / 2, width, CV_8UC1, nv21};
+
+    Mat mat;
+
+    cvtColor(nv21Mat, mat, COLOR_YUV2RGB_NV21, 3);
+
+    return mat;
+}
+
 void mcv::cvt::bitmap_2_mat(JNIEnv *env, jobject bmp, Mat &mat,
                             const bool &needUnPremultiplyAlpha) noexcept {
 

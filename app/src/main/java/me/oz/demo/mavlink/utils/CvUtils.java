@@ -28,4 +28,6 @@ public class CvUtils {
 
     public native static void nativeYUV420888Gray(ByteBuffer y, ByteBuffer u, ByteBuffer v, int width, int height);
 
+    public native static void nativeYUV420888Bitmap565(ByteBuffer y, ByteBuffer u, ByteBuffer v, Bitmap bmp, int width, int height);
+
 }

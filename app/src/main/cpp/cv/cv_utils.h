@@ -27,6 +27,11 @@ namespace mcv {
         void mat_2_bitmap(JNIEnv *env, Mat &mat, jobject &bmp,
                           const bool &needPremultiplyAlpha = false) noexcept;
 
+        Mat nv21_2_mat_RGB(uint8_t *nv21, int width, int height) noexcept;
+
+        void nv21_2_mat_RGB(Mat &dst, uint8_t *nv21, int width, int height) noexcept;
+
+        void nv21_2_mat_RGBA(Mat &dst, uint8_t *nv21, int width, int height) noexcept;
     }
 
 }

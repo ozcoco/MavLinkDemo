@@ -5,3 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 #cv-lib
 message(STATUS "build cv-lib ------>")
 add_subdirectory(cv)
+
+message(STATUS "build av-lib ------>")
+add_subdirectory(av)

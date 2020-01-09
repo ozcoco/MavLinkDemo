@@ -3,7 +3,6 @@ package me.oz.demo.mavlink;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -28,7 +27,6 @@ import java.util.concurrent.Executors;
 
 import me.oz.demo.mavlink.databinding.ActivityMainBinding;
 import me.oz.demo.mavlink.utils.CvUtils;
-import me.oz.demo.mavlink.utils.ImageUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -183,13 +181,26 @@ public class MainActivity extends AppCompatActivity {
 
         ImageAnalysis imageAnalysis = new ImageAnalysis(config);
 
+        final Bitmap[] bmp = {null};
+
         imageAnalysis.setAnalyzer(mExecutor, (image, rotationDegrees) -> {
 
             if (image.getImage() == null) return;
 
             Log.d("^_^ ---->", "image format: " + image.getImage().getFormat());
 
-            CvUtils.nativeYUV420888Gray(image.getPlanes()[0].getBuffer(),
+            Log.d("^_^ ---->", "rotationDegrees: " + rotationDegrees);
+
+            if (bmp[0] == null)
+                bmp[0] = Bitmap.createBitmap(image.getWidth(),
+                        image.getHeight(), Bitmap.Config.RGB_565);
+
+            CvUtils.nativeYUV420888Bitmap565(image.getPlanes()[0].getBuffer(),
+                    image.getPlanes()[1].getBuffer(),
+                    image.getPlanes()[2].getBuffer(), bmp[0], image.getWidth(),
+                    image.getHeight());
+
+/*            CvUtils.nativeYUV420888Gray(image.getPlanes()[0].getBuffer(),
                     image.getPlanes()[1].getBuffer(),
                     image.getPlanes()[2].getBuffer(),
                     image.getWidth(),
@@ -199,13 +210,13 @@ public class MainActivity extends AppCompatActivity {
 
             Bitmap bmp = BitmapFactory.decodeByteArray(pxs, 0, pxs.length);
 
-//            CvUtils.nativeBitmapGray(bmp);
+//            CvUtils.nativeBitmapGray(bmp);*/
 
             mBinding.imgShow.post(() -> {
 
                 mBinding.imgShow.setRotation(rotationDegrees);
 
-                mBinding.imgShow.setImageBitmap(bmp);
+                mBinding.imgShow.setImageBitmap(bmp[0]);
             });
         });
 
