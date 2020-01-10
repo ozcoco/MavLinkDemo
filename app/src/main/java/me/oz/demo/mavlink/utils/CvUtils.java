@@ -22,6 +22,8 @@ public class CvUtils {
         System.loadLibrary("cv-lib");
     }
 
+    public native static void destroy();
+
     public native static byte[] nativeNV21Gray(byte[] yuv, int width, int height);
 
     public native static void nativeBitmapGray(Bitmap bmp);

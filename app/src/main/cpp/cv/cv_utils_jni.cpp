@@ -15,8 +15,7 @@
 using namespace mcv;
 using namespace cv;
 
-#define YUV_COLOR_GRAY 128
-
+constexpr uint8_t YUV_COLOR_GRAY = 128;
 
 extern "C"
 JNIEXPORT void
@@ -41,7 +40,8 @@ Java_me_oz_demo_mavlink_utils_CvUtils_nativeYUV420888Bitmap565(JNIEnv *env, jcla
 
     void *v = env->GetDirectBufferAddress(vBuff);
 
-    std::unique_ptr<uint8_t> nv21{new uint8_t[ySize + vSize + uSize]};
+    std::unique_ptr<uint8_t[]> nv21 = std::make_unique<uint8_t[]>(
+            static_cast<size_t>(ySize + vSize + uSize));
 
     memcpy(nv21.get(), y, (size_t) ySize);
 
@@ -88,7 +88,7 @@ Java_me_oz_demo_mavlink_utils_CvUtils_nativeYUV420888Gray(JNIEnv *env, jclass ty
         e = saturate_cast<uint8_t>(YUV_COLOR_GRAY);
     });
 
-    std::unique_ptr<uint8_t> nv21{new uint8_t[ySize + vSize + uSize]};
+    std::unique_ptr<uint8_t[]> nv21{new uint8_t[ySize + vSize + uSize]};
 
     memcpy(nv21.get(), y, (size_t) ySize);
 
@@ -160,4 +160,10 @@ JNICALL Java_me_oz_demo_mavlink_utils_CvUtils_nativeNV21Gray(JNIEnv *env, jclass
 //    env->ReleaseByteArrayElements(yuv, reinterpret_cast<jbyte *>(buf.get()), 0);
 
     return dstData;
+}
+
+extern "C"
+JNIEXPORT
+void JNICALL Java_me_oz_demo_mavlink_utils_CvUtils_destroy(JNIEnv *env, jclass type) {
+
 }

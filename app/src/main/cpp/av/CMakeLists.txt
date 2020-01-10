@@ -27,7 +27,7 @@ set(ffmpeg-lib
 
 add_library(av-lib SHARED ${AV-SRC})
 
-target_link_libraries(av-lib android jnigraphics m log ${ffmpeg-lib})
+target_link_libraries(av-lib log ${ffmpeg-lib})
 
 
 
