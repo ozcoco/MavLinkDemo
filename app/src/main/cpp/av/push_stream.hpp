@@ -7,6 +7,7 @@
 
 #include<string>
 #include <utils/log.h>
+#include "av_utils.hpp"
 
 #ifdef __cplusplus
 extern "C"
@@ -15,6 +16,8 @@ extern "C"
 #include <libavutil/opt.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 #ifdef __cplusplus
 };
 #endif
@@ -129,9 +132,6 @@ namespace mav {
 
             int stream_mapping_size = 0; // 输入文件中流的总数量
 
-            //分配output context
-            ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", url.c_str());
-
             if (ret < 0) {
 
                 av_log(NULL, AV_LOG_ERROR, "Could not open input file '%s'", in_filename);
@@ -232,6 +232,8 @@ namespace mav {
 
                 // 循环读取每一帧数据
                 ret = av_read_frame(ifmt_ctx, &pkt);
+
+
                 if (ret < 0) // 读取完后退出循环
                     break;
 
@@ -287,11 +289,86 @@ namespace mav {
 
         }
 
+
+        /***
+         *
+            1.av_register_all() : 注册组件, 包括FFmpeg所有编解码器
+            2.avformat_alloc_context(): 初始化封装格式上下文
+            3.avio_open(): 打开输入文件,关联封装格式上下文到输出文件
+            4.avformat_new_stream(): 创建输出码流
+            5.avcodec_find_encoder():查找视频编码器
+            6.avcodec_open2(): 打开解码器
+            7.avformat_write_header(): 写入文件头信息
+            8.av_image_fill_arrays():存储一帧像素数据缓冲区
+            9.读取帧av_read_frame() 返回值<0 则结束
+            10.av_frame->data: 读取缓冲数据转成AVFrame类
+            11.avcodec_send_frame(): 发送一帧视频像素数据(yuv格式)
+            12.avcodec_receive_packet(): 接收一帧视频数据,编码为视频压缩格式(如H.264格式)
+            13.av_write_frame():编码码成功写入文件,再循环读取下一帧
+            14.flush_encoder():写入剩余的帧数据
+            15.av_write_trailer():写入文件尾部信息
+         * **/
+
         inline void pushByRTMP(unsigned char *nv21, const unsigned long int &size, int width,
                                int height) const noexcept {
 
+            int ret;
+
+            AVFormatContext *ofmt_ctx;
+
+            //分配output context
+            ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", NULL);
+
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "---> avformat_alloc_output_context2");
+                goto end;
+            }
+
+            if (!(ofmt_ctx->flags & AVFMT_NOFILE)) {
+                ret = avio_open(&ofmt_ctx->pb, url.c_str(), AVIO_FLAG_WRITE);
+                if (ret < 0) {
+                    av_log(NULL, AV_LOG_ERROR, "Could not open output file '%s'", url.c_str());
+                    goto end;
+                }
+            }
+
+            // 写入新的多媒体文件的头
+            ret = avformat_write_header(ofmt_ctx, NULL);
+            if (ret < 0) {
+                fprintf(stderr, "Error occurred when opening output file\n");
+                goto end;
+            }
+
+            AVFrame *yuvFrame = av_frame_alloc();
+
+            nv21_2_avframe(yuvFrame, nullptr, 223, 325);
+
+//            avcodec_send_frame()
+
+//            avcodec_receive_packet()
+
+
+//            AVCodecParameters *codecPtr = avcodec_parameters_alloc();
+
+//            av_image_fill_arrays();
+
+//            av_read_frame()
+
+
+
+            end:
+            avformat_close_input(&ofmt_ctx);
+
+            /* close output */
+            if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE))
+                avio_closep(&ofmt_ctx->pb);
+
+            avformat_free_context(ofmt_ctx);
+
+//            avcodec_parameters_free(&codecPtr);
 
         }
+
 
 //        inline void pushByTCP(unsigned char *nv21, const unsigned long int &size, int width,
 //                              int height) noexcept {
