@@ -8,6 +8,8 @@
 #include<string>
 #include <utils/log.h>
 #include "av_utils.hpp"
+#include <cstdio>
+#include <ctime>
 
 #ifdef __cplusplus
 extern "C"
@@ -42,7 +44,7 @@ namespace mav {
     };
 
 
-    inline void custom_log(void *ptr, int level, const char *fmt, va_list vl) noexcept {
+    inline void custom_log_callback(void *ptr, int level, const char *fmt, va_list vl) noexcept {
 
         switch (level) {
             case AV_LOG_INFO:
@@ -73,11 +75,112 @@ namespace mav {
                 url(url),
                 streamType(streamType),
                 mimeType(mimeType),
-                protocolType(protocolType) {}
+                protocolType(protocolType) {
+
+            init();
+        }
+
+        virtual ~PushStreamer() {
+
+            destroy();
+
+        }
+
+
+        inline void init() noexcept {
+
+            initStreamConfig();
+
+        }
+
+        inline void destroy() noexcept {
+
+            avformat_close_input(&ofmt_ctx);
+
+            /* close output */
+            if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE))
+                avio_closep(&ofmt_ctx->pb);
+
+            avformat_free_context(ofmt_ctx);
+
+            if (avctx) {
+                avcodec_close(avctx);
+
+                avcodec_free_context(&avctx);
+            }
+
+        }
+
+
+        inline void initStreamConfig() noexcept {
+
+            av_log_set_callback(custom_log_callback);
+
+            int ret;
+
+            //分配output context
+            ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", url.c_str());
+
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "---> avformat_alloc_output_context2");
+                destroy();
+                return;
+            }
+
+            if (!(ofmt_ctx->flags & AVFMT_NOFILE)) {
+                ret = avio_open(&ofmt_ctx->pb, url.c_str(), AVIO_FLAG_WRITE);
+                if (ret < 0) {
+                    av_log(NULL, AV_LOG_ERROR, "Could not open output file '%s'", url.c_str());
+                    destroy();
+                    return;
+                }
+            }
+
+            out_stream = avformat_new_stream(ofmt_ctx, ofmt_ctx->video_codec);
+
+            if (!out_stream) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when new stream \n");
+                destroy();
+                return;
+            }
+
+            avctx = avcodec_alloc_context3(ofmt_ctx->video_codec);
+
+            if (!avctx) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when alloc context\n");
+                destroy();
+                return;
+            }
+
+            ret = avcodec_open2(avctx, ofmt_ctx->video_codec, NULL);
+
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when codec open\n");
+                destroy();
+                return;
+            }
+
+            // 写入新的多媒体文件的头
+            ret = avformat_write_header(ofmt_ctx, NULL);
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when opening output file\n");
+                destroy();
+                return;
+            }
+
+            avpkt = av_packet_alloc();
+
+            if (!avpkt) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when packet alloc\n");
+                destroy();
+                return;
+            }
+
+        };
 
         inline void
         push(unsigned char *nv21, const unsigned long int &size, int width,
-             int height) const noexcept {
+             int height) noexcept {
 
             switch (streamType) {
 
@@ -112,7 +215,7 @@ namespace mav {
 
 
         inline void pushByRTSP(unsigned char *nv21, const unsigned long int &size, int width,
-                               int height) const noexcept {
+                               int height) noexcept {
 
             const char in_filename[] = "E:/testVideo/20.mp4";
 
@@ -310,62 +413,62 @@ namespace mav {
          * **/
 
         inline void pushByRTMP(unsigned char *nv21, const unsigned long int &size, int width,
-                               int height) const noexcept {
+                               int height) noexcept {
 
             int ret;
 
-            AVFormatContext *ofmt_ctx;
-
-            //分配output context
-            ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", NULL);
-
-            if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "---> avformat_alloc_output_context2");
-                goto end;
-            }
-
-            if (!(ofmt_ctx->flags & AVFMT_NOFILE)) {
-                ret = avio_open(&ofmt_ctx->pb, url.c_str(), AVIO_FLAG_WRITE);
-                if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Could not open output file '%s'", url.c_str());
-                    goto end;
-                }
-            }
-
-            // 写入新的多媒体文件的头
-            ret = avformat_write_header(ofmt_ctx, NULL);
-            if (ret < 0) {
-                fprintf(stderr, "Error occurred when opening output file\n");
-                goto end;
-            }
-
             AVFrame *yuvFrame = av_frame_alloc();
 
-            nv21_2_avframe(yuvFrame, nullptr, 223, 325);
+            yuvFrame->pts = time(NULL);
 
-//            avcodec_send_frame()
+            ret = nv21_2_avframe(yuvFrame, nv21, width, height);
 
-//            avcodec_receive_packet()
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when nv21 to frame \n");
+                destroy();
+                return;
+            }
 
+            ret = avcodec_send_frame(avctx, yuvFrame);
 
-//            AVCodecParameters *codecPtr = avcodec_parameters_alloc();
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when send frame \n");
+                destroy();
+                return;
+            }
 
-//            av_image_fill_arrays();
+            av_packet_unref(avpkt);
 
-//            av_read_frame()
+            ret = avcodec_receive_packet(avctx, avpkt);
 
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when receive packet \n");
+                destroy();
+                return;
+            }
 
+            AVRational stime = (AVRational) {1, 25};
 
-            end:
-            avformat_close_input(&ofmt_ctx);
+            AVRational dtime = (AVRational) {1, 25};
 
-            /* close output */
-            if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE))
-                avio_closep(&ofmt_ctx->pb);
+            if (avpkt->stream_index == out_stream->index) {
+                stime = avctx->time_base;
+                dtime = out_stream->time_base;
+            }
 
-            avformat_free_context(ofmt_ctx);
+            avpkt->pts = av_rescale_q(avpkt->pts, stime, dtime);
 
-//            avcodec_parameters_free(&codecPtr);
+            avpkt->dts = av_rescale_q(avpkt->dts, stime, dtime);
+
+            avpkt->duration = av_rescale_q(avpkt->duration, stime, dtime);
+
+            ret = av_interleaved_write_frame(ofmt_ctx, avpkt);
+
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "Error occurred when nterleaved write frame \n");
+                destroy();
+                return;
+            }
 
         }
 
@@ -415,6 +518,14 @@ namespace mav {
         PUSH_PROTOCOL_TYPE protocolType;
 
         std::string url;
+
+        AVFormatContext *ofmt_ctx;
+
+        AVCodecContext *avctx;
+
+        AVPacket *avpkt;
+
+        AVStream *out_stream;
     };
 
 }
