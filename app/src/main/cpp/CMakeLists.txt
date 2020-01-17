@@ -6,5 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 message(STATUS "build cv-lib ------>")
 add_subdirectory(cv)
 
+#av-lib
 message(STATUS "build av-lib ------>")
 add_subdirectory(av)
+
+#event-lib
+message(STATUS "build av-lib ------>")
+add_subdirectory(event)

@@ -61,7 +61,10 @@ public class MainActivity extends AppCompatActivity {
     private void requestPermission() {
 
         String[] permissions = new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA
+                Manifest.permission.INTERNET,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
         };
 
         boolean isGrant = true;

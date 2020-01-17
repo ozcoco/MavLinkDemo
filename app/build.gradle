@@ -37,7 +37,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs "third_party/curl", "third_party/openssl", "third_party/zlib", "opencv/libs", "opencv/3rdparty", "opencv/staticlibs", "libs", "ffmpeg"
+            jniLibs.srcDirs "libevent", "third_party/curl", "third_party/openssl", "third_party/zlib", "opencv/libs", "opencv/3rdparty", "opencv/staticlibs", "libs", "ffmpeg"
         }
     }
 
