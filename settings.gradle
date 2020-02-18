@@ -1,2 +1,2 @@
-include ':app', ':viewpager2', ':SwipeRefreshMultipleViews', ':SimpleTransition', ':RecyclerViewAnimations', ':DataBindingDataBoundRecyclerView'
+include ':app', ':viewpager2', ':SwipeRefreshMultipleViews', ':SimpleTransition', ':RecyclerViewAnimations', ':DataBindingDataBoundRecyclerView', ':ui'
 rootProject.name='MavLink'
