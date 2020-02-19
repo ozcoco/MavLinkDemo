@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <me.oz.demo.ui.DegreeView
+        android:id="@+id/v_degree"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#000000"

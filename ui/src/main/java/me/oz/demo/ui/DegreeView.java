@@ -200,4 +200,20 @@ public class DegreeView extends View {
 
     }
 
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
+
+    public CharSequence getText() {
+        return text;
+    }
+
+    public void setText(CharSequence text) {
+        this.text = text;
+    }
 }
