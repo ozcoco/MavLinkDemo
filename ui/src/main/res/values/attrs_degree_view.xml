@@ -1,0 +1,17 @@
+<resources>
+    <declare-styleable name="DegreeView">
+        <attr name="degree" format="integer" />
+        <attr name="gap" format="integer" />
+        <attr name="indicatorColor" format="color" />
+        <attr name="indicatorWidth" format="dimension" />
+        <attr name="indicatorHeight" format="dimension" />
+        <attr name="indicatorRadius" format="dimension" />
+        <attr name="tickMarksColor" format="color" />
+        <attr name="tickMarksWidth" format="dimension" />
+        <attr name="tickMarksHeight" format="dimension" />
+        <attr name="tickMarksRadius" format="dimension" />
+        <attr name="text" format="string" />
+        <attr name="textColor" format="color" />
+        <attr name="textSize" format="dimension" />
+    </declare-styleable>
+</resources>

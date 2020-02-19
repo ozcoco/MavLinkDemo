@@ -6,13 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <me.oz.demo.ui.DegreeView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000000"
+        android:padding="16dp"
+        app:degree="-90"
+        app:gap="8"
+        app:indicatorColor="#ff00ff00"
+        app:indicatorHeight="6dp"
+        app:indicatorRadius="45dp"
+        app:indicatorWidth="40dp"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="-90°"
+        app:textColor="#ffffffff"
+        app:textSize="120sp"
+        app:tickMarksColor="#ffffffff"
+        app:tickMarksHeight="5dp"
+        app:tickMarksRadius="45dp"
+        app:tickMarksWidth="30dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
