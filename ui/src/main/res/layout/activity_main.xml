@@ -1,34 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <me.oz.demo.ui.DegreeView
-        android:id="@+id/v_degree"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#000000"
-        android:padding="16dp"
-        app:degree="-90"
-        app:gap="8"
-        app:indicatorColor="#ff00ff00"
-        app:indicatorHeight="6dp"
-        app:indicatorRadius="45dp"
-        app:indicatorWidth="40dp"
-        app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:text="-90°"
-        app:textColor="#ffffffff"
-        app:textSize="120sp"
-        app:tickMarksColor="#ffffffff"
-        app:tickMarksHeight="5dp"
-        app:tickMarksRadius="45dp"
-        app:tickMarksWidth="30dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

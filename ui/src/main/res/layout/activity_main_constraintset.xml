@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="degree"
+            type="int" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <me.oz.demo.ui.view.DegreeView
+            android:id="@+id/v_degree"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#f00000"
+            android:padding="16dp"
+            app:degree="@{degree, default = 90}"
+            app:gap="8"
+            app:indicatorColor="#ff00ff00"
+            app:indicatorHeight="6dp"
+            app:indicatorRadius="45dp"
+            app:indicatorWidth="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:text="@{degree + `°`, default = 90}"
+            app:textColor="#ffffffff"
+            app:textSize="120sp"
+            app:tickMarksColor="#ffffffff"
+            app:tickMarksHeight="5dp"
+            app:tickMarksRadius="45dp"
+            app:tickMarksWidth="30dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

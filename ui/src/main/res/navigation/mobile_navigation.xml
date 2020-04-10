@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_constraint">
+
+    <fragment
+        android:id="@+id/nav_constraint"
+        android:name="me.oz.demo.ui.ui.home.ConstraintFragment"
+        android:label="@string/menu_constraint"
+        tools:layout="@layout/fragment_constraintlayout" />
+
+    <fragment
+        android:id="@+id/nav_anim"
+        android:name="me.oz.demo.ui.ui.gallery.AnimFragment"
+        android:label="@string/menu_anim"
+        tools:layout="@layout/fragment_anim" />
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="me.oz.demo.ui.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_tools"
+        android:name="me.oz.demo.ui.ui.tools.ToolsFragment"
+        android:label="@string/menu_tools"
+        tools:layout="@layout/fragment_tools" />
+
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="me.oz.demo.ui.ui.share.ShareFragment"
+        android:label="@string/menu_share"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/nav_send"
+        android:name="me.oz.demo.ui.ui.send.SendFragment"
+        android:label="@string/menu_send"
+        tools:layout="@layout/fragment_send" />
+</navigation>

@@ -1,4 +1,4 @@
-package me.oz.demo.ui;
+package me.oz.demo.ui.view;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -11,10 +11,16 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import me.oz.demo.ui.R;
+
 /**
  * TODO: document your custom view class.
  */
 public class DegreeView extends View {
+
+    private final static int BEGIN_LEFT = 0;
+
+    private final static int BEGIN_RIGHT = 1;
 
     private int gap = 10;
 
@@ -41,6 +47,8 @@ public class DegreeView extends View {
     private int textColor = Color.WHITE;
 
     private int textSize = 16;
+
+    private int begin = BEGIN_RIGHT;
 
     private TextPaint textPaint;
 
@@ -80,6 +88,8 @@ public class DegreeView extends View {
 
         degree = a.getInt(R.styleable.DegreeView_degree, degree);
 
+        begin = a.getInt(R.styleable.DegreeView_begin, begin);
+
         text = a.getText(R.styleable.DegreeView_text);
 
         textSize = a.getDimensionPixelSize(R.styleable.DegreeView_textSize, textSize);
@@ -110,13 +120,40 @@ public class DegreeView extends View {
 
         textPaint.setDither(true);
 
-        invalidateTextPaintAndMeasurements();
     }
 
-    private void invalidateTextPaintAndMeasurements() {
 
+    private RectF createTickWithBegin() {
+
+        RectF rt = null;
+
+        final int inner = (indicatorWidth - tickMarksWidth) / 2;
+
+        final int py = getHeight() / 2;
+
+        switch (begin) {
+
+            case BEGIN_LEFT:
+
+                rt = new RectF(getPaddingStart() + inner,
+                        py - Math.round(tickMarksHeight / 2),
+                        getPaddingStart() + inner + tickMarksWidth,
+                        py + Math.round(tickMarksHeight / 2));
+
+                break;
+
+            case BEGIN_RIGHT:
+
+                rt = new RectF(getWidth() - getPaddingEnd() - tickMarksWidth - inner,
+                        py - Math.round(tickMarksHeight / 2),
+                        getWidth() - getPaddingEnd() - inner,
+                        py + Math.round(tickMarksHeight / 2));
+
+                break;
+        }
+
+        return rt;
     }
-
 
     private void drawTickMarks(Canvas canvas) {
 
@@ -126,9 +163,7 @@ public class DegreeView extends View {
 
         final int py = getHeight() / 2;
 
-        final int inner = (indicatorWidth - tickMarksWidth) / 2;
-
-        final RectF rt = new RectF(getWidth() - getPaddingEnd() - tickMarksWidth - inner, py - Math.round(tickMarksHeight / 2), getWidth() - getPaddingEnd() - inner, py + Math.round(tickMarksHeight / 2));
+        final RectF rt = createTickWithBegin();
 
         final int N = Math.abs(Math.round(degree / gap));
 
@@ -145,6 +180,35 @@ public class DegreeView extends View {
         canvas.restore();
     }
 
+
+    private RectF createIndicatorWithBegin() {
+
+        RectF rt = null;
+
+        final int py = getHeight() / 2;
+
+        switch (begin) {
+
+            case BEGIN_LEFT:
+
+                rt = new RectF(getPaddingStart(),
+                        py - Math.round(indicatorHeight / 2),
+                        getPaddingStart() + indicatorWidth,
+                        py + Math.round(indicatorHeight / 2));
+                break;
+
+            case BEGIN_RIGHT:
+
+                rt = new RectF(getWidth() - getPaddingEnd() - indicatorWidth,
+                        py - Math.round(indicatorHeight / 2),
+                        getWidth() - getPaddingEnd(),
+                        py + Math.round(indicatorHeight / 2));
+                break;
+        }
+
+        return rt;
+    }
+
     private void drawIndicator(Canvas canvas) {
 
         textPaint.setColor(indicatorColor);
@@ -153,7 +217,7 @@ public class DegreeView extends View {
 
         final int py = getHeight() / 2;
 
-        final RectF rt = new RectF(getWidth() - getPaddingEnd() - indicatorWidth, py - Math.round(indicatorHeight / 2), getWidth() - getPaddingEnd(), py + Math.round(indicatorHeight / 2));
+        final RectF rt = createIndicatorWithBegin();
 
         final int N = Math.abs(Math.round(degree / gap));
 
@@ -207,6 +271,7 @@ public class DegreeView extends View {
 
     public void setDegree(int degree) {
         this.degree = degree;
+        invalidate();
     }
 
     public CharSequence getText() {
@@ -215,5 +280,6 @@ public class DegreeView extends View {
 
     public void setText(CharSequence text) {
         this.text = text;
+        invalidate();
     }
 }
